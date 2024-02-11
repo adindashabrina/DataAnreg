@@ -1,0 +1,226 @@
+---
+title: "TUGAS KELOMPOK 15 ANREG"
+author: "1. YUMNA SALMA (G1401221004)
+         2. CINDY APRILIYANTI (G1401221010)
+         3. Adinda Shabrina Putri Salsabila(G1401221081)
+         4. Ria Yunita(G1401221115) "
+date: "2024-02-11"
+output: html_document
+---
+
+
+```{r}
+Data_kaggle <- read.csv("https://github.com/adindashabrina/DataAnreg/raw/main/jam_tidur.csv", header = TRUE, sep=",")
+head(Data_kaggle)
+```
+
+
+
+```{r}
+y<-Data_kaggle$Quality.of.Sleep
+x<-Data_kaggle$Sleep.Duration
+```
+
+```{r}
+data_tidur <-data.frame(cbind(x,y))
+head(data_tidur)
+
+```
+
+```{r}
+n <- nrow(data_tidur)
+n
+```
+```{r}
+p<- ncol(data_tidur)
+p
+```
+
+## PEMBENTUKAN MODEL TANPA FUNGSI BAWAAN(MANUAL)
+
+Parameter Regresi 
+
+```{r}
+b1<-(sum(x*y)-sum(x)*sum(y)/n)/(sum(x^2)-(sum(x)^2/n))
+b0<-mean(y)-b1*mean(x)
+b1
+b0
+```
+# INTEPRETASI B1
+B1 = 1,32 > Koefisien 1.327 menunjukkan bahwa untuk setiap peningkatan satu jam dalam durasi tidur (x), kualitas tidur (y) meningkat sebesar 1.327. Selain itu, B1 ini juga menunjukan hubungan yang positif anata durasi tidur dengan kualitas tidur. 
+
+# INTERPRETASI B0
+B0 = -2,15 > Nilai B0 -2,15 menunjukkan bahwa jika duraasi tidur nya adalah 0, maka kualitas tidur akan memiliki nilai -2,15. Namun, interpretasi ini tidak bermakna karena dalam konteks dunia nyata, durasi tidur tidak mungkin 0, sehingga saat B0 nya bernilai 0 tidak mengandung makna tertentu. 
+
+## UKURAN KERAGAMAN 
+
+```{r}
+galat<-y-(b0+b1*x)
+JKG <- sum((y - (b0+b1*x))^2)
+JKG
+```
+```{r}
+JKReg <- sum(((b0+b1*x)- mean(y))^2)
+JKReg
+```
+
+```{r}
+JKT <- sum((y - mean(y))^2)
+JKT
+```
+```{r}
+dbReg<-1
+dbg<-n-2
+dbt<-n-1
+dbReg
+dbg
+dbt
+```
+
+```{r}
+Fhit<-(JKReg/dbReg)/(JKG/dbg)
+Fhit
+```
+## PERSAMAAN REGRESI LINEAR SEDERHANA 
+```{r}
+model<-lm(y~x,data<-data_tidur)
+summary(model)
+```
+Berdasarkan perhitungan, didapat dugaan persamaan regresi linear sebagai berikut. Dugaan persamaan tersebut dapat pula disebut sebagai nilai harapan dari peubah respons Y
+y duga =-2,15+1,327x 
+
+# INTERPRETASI PERSAMAAN REGRESI
+persamaan regresi tersebut menunjukkan bahwa semakin lama seseorang tidur, kemungkinan besar kualitas tidurnya akan semakin baik atau kualitas tidurnya meningkat sebesar 1,327 per satu jam durasi tidur. 
+
+## Scatter Plot 
+
+```{r}
+y.bar <- mean(y)
+plot(x,y)
+abline(model, col="red")
+text(30, 220, "Y_duga", adj = c(-0.1, 1.5), col = "red", cex = 0.8)
+abline(h=y.bar, col="blue")
+text(31, 185, "Y_bar", adj = c(-0.1, 1.5), col = "blue", cex = 0.8)
+```
+# INTERPRETASU SCATTER PLOT 
+garis biru menunjukkan rataan dari kualitas tidur, sedangkan garis merah merupakan garis persamaan linear sederhana yang bernilai positif karena garisnya yang menuju keatas kanan dari sumbu y. 
+
+```{r}
+anova.model<-anova(model)
+anova.model
+```
+```{r}
+(KTG<-anova.model$'Mean Sq'[2])
+```  
+Dari tabel anova diatas diperoleh informasi bahwa nilai dari JKR nya sebesar 414,17, JKG sebesar 117,37, JKT sebesar 531,54, dan KTG sebesar 0,32, KTR 414,17. 
+
+# Galat baku 
+```{r}
+galat_baku<- sqrt(KTG)
+galat_baku
+```
+## KORELASI 
+
+```{r}
+r<-(sum(x*y)-sum(x)*sum(y)/n)/
+  sqrt((sum(x^2)-(sum(x)^2/n))*(sum(y^2)-(sum(y)^2/n)))
+r
+```
+# INTERPRETASI 
+Korelasi 0.8827168 menunjukkan nilai kekuatan hubungan antara variabel penjelas  yakni durasi tidur terhadap variabel respon yakni kualitas tidur yang baik karena mendekati nilai 1. Dari nilai ini juga dapat diketahui arah hubungan antara kedua peubah tersebut yakni linear positif, yang berarti semakin meningkatnya durasi tidur, maka kualitas tidur juga akan semakin baik.
+
+## Koefisien Determinasi 
+```{r}
+Koef_det<-r^2
+Koef_det
+
+```
+# INTERPRETASI
+Koefisien determinasi 0.779189 menunjukkan kebaikan model regresi yang cukup baik dalam menggambarkan hubungan antara variabel penjelas dengan variabel respon.
+
+## ADJUSTED R SQUARE 
+```{r}
+Adj_R2<-1-((1-Koef_det)*(n-1)/(n-1-1))
+Adj_R2
+
+```
+
+# INTERPRETASI
+Adjusted R Square 0.7785938 atau sekitar 78% menunjukkan besar ukuran variabel penjelas dapat menjelaskan variabel respon, yang berarti sekitar 78% dari variasi dalam variabel respon dapat dijelaskan oleh variabel penjelas yang ada dalam model regresi.
+
+## UJI HIPOTESIS B0
+
+```{r}
+(KTG<-anova.model$'Mean Sq'[2])
+```
+```{r}
+(se_b0 <- sqrt(KTG*(1/n+mean(x)^2/sum((x-mean(x))^2))))
+```
+```{r}
+(t_b0 <- b0/se_b0)
+```
+# PENJELASAN UJI HIPOTESIS B0
+Uji hipotesis untuk intersep garis regresi (beta0)
+H0: beta0 = 0 (semua nilai y dapat dijelaskan oleh x)
+H1: beta0 /= 0 (ada nilai y yang tidak dapat dijelaskan oleh x)
+
+t-hitung = -8.182, t-tabel = 1,966378803 (t(alfa/2,db =n-2))
+Karena t-hitung < -t-tabel maka tolak H0 yang artinya terdapat cukup bukti untuk menyatakan semua nilai kualitas tidur dapat dijelaskan oleh durasi total waktu tidur pada selang kepercayaan 95%.
+
+## UJI HIPOTESIS B1 
+
+```{r}
+(se_b1 <- sqrt(KTG/sum((x-mean(x))^2)))
+
+```
+```{r}
+(t_b1 <- b1/se_b1)
+```
+# PENJELASAN UJI HIPOTESIS B1
+Uji hipotesis kemiringan garis regresi populasi (beta1)
+H0: beta1 = 0 (Tidak ada hubungan linier anatra kualitas tidur dengan lama waktu tidur)
+H1: beta1 /= 0 (Ada hubungan linier antara kualitas tidur dengan lama waktu tidur)
+
+t-hitung = 36.18245, t-tabel = 1,966378803 (t(alfa/2,db =n-2))
+Karena t-hitung > t-tabel maka Tolak H0 yang artinya terdapat cukup bukti untuk menyatakan adanya hubungan linier antara kualitas tidur dengan lama waktu tidur pada selang kepercayaan 95%.
+
+## PENDUGA SELANG KEPERCAYAAN 95% BAGI B0
+```{r}
+#batas bawah beta0
+(ba.b0 <- b0 - abs(qt(0.025, df=n-2))*se_b0)
+```
+```{r}
+#batas atas beta0
+(ba.b0 <- b0 + abs(qt(0.025, df=n-2))*se_b0)
+```
+Pada tingkat kepercayaan 95% dapat dinyatakan dugaan parameter beta0 berada dalam selang -2.67 hingga -1.635.
+
+## PENDUGA SELANG KEPERCAYAAN 95% BAGI B1
+```{r}
+#batas bawah beta1
+(bb.b1 <- b1 - abs(qt(0.025, df=n-2))*se_b1)
+```
+```{r}
+#batas atas beta1
+(ba.b1 <- b1 + abs(qt(0.025, df=n-2))*se_b1)
+```
+Pada tingkat kepercayaan 95% dapat dinyatakan dugaan parameter beta1 berada dalam selang 1.2549 hingga 1.399135.
+
+
+## SELANG KEPERCAYAAN RATAAN(NILAI HARAPAN) AMATAN
+Misalkan kita ingin menduga nilai rataan (harapan) amatan ketika nilai x=6.1. Kita dapat memanfaatkan fungsi predict untuk mendapatkan nilai dugaan dan selang kepercayaannya sebagai berikut.
+
+```{r}
+amatan.diduga <- data.frame(x=6.1)
+predict(model, amatan.diduga, interval = "confidence")
+```
+Berdasarkan output sintaks di atas, diketahui bahwa dugaan rataan nilai Y ketika nilai x=6.1 adalah 5.942159. Selain itu, diindikasikan juga bahwa dalam taraf kepercayaan 95%, diyakini bahwa nilai dugaan rataan Y ketika nilai x=6.1 berada dalam selang 5.848394 hingga 6.035924.
+
+## SELANG KEPERCAYAAN INDIVIDU AMATAN 
+Misalkan kita ingin menduga nilai individu amatan ketika nilai x=6.1. Kita dapat memanfaatkan fungsi predict untuk mendapatkan nilai dugaan dan selang kepercayaannya sebagai berikut.
+
+```{r}
+predict(model, amatan.diduga, interval = "prediction")
+```
+Berdasarkan output sintaks di atas, diketahui bahwa dugaan nilai individu Y ketika nilai x=6.1 adalah 5.942159. Selain itu, diindikasikan juga bahwa dalam taraf kepercayaan 95%, diyakini bahwa nilai amatan individu Y ketika nilai x=6.1 berada dalam selang 4.832179 hingga 7.05214.
+
